@@ -4,9 +4,9 @@ require('dotenv').config()
 
 const connection = mysql.createConnection({
     host:'localhost',
-    user:'root',
+    user:process.env.DB_USER,
     password: process.env.MARIADBPASSWORD,
-    database: 'capstone'
+    database: process.env.DB_NAME
 })
 
 connection.connect((err) => {
