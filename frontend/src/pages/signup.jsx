@@ -23,7 +23,7 @@ import img1 from '../assets/img1.png'
 
 function SignUpPage() {
   const [formData, setFormData] = useState({
-    name: "",
+    fullname: "",
     contact: "",
     email: "",
     field: "",
@@ -45,7 +45,7 @@ function SignUpPage() {
 
   const validateForm = () => {
     let formErrors = {};
-    if (!formData.name) formErrors.name = "Name is required";
+    if (!formData.fullname) formErrors.fullname = "Name is required";
     if (!formData.contact) formErrors.contact = "Contact number is required";
     if (!formData.email) formErrors.email = "Email is required";
     if (!formData.field) formErrors.field = "Field is required";
@@ -56,15 +56,41 @@ function SignUpPage() {
     return Object.keys(formErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   if (validateForm()) {
+  //     // For now, you can replace this with an API call to create the user
+  //     alert("Signup successful");
+  //     navigate("/login"); // Redirect to login page after successful signup
+  //   }
+  // };
+  const handleSubmit = async (e) => { // Make handleSubmit async
     e.preventDefault();
     if (validateForm()) {
-      // For now, you can replace this with an API call to create the user
-      alert("Signup successful");
-      navigate("/login"); // Redirect to login page after successful signup
-    }
-  };
+        try {
+            const response = await fetch("http://localhost:4040/signup", { // Replace with your API endpoint
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            });
 
+            if (response.ok) {
+                alert("Signup successful");
+                navigate("/login");
+            } else {
+                const errorData = await response.json();
+                alert(`Signup failed: ${errorData.message || "An error occurred"}`); // Display backend error message
+            }
+        } catch (error) {
+            console.error("Error during signup:", error);
+            alert("Signup failed: An unexpected error occurred.");
+        }
+    }
+};
+
+ 
   return (
     <Flex minHeight="100vh">
       {/* Left Half (Background Image and Info) */}
@@ -115,16 +141,16 @@ function SignUpPage() {
           <form onSubmit={handleSubmit}>
             <Stack spacing={4}>
               {/* Name */}
-              <FormControl isInvalid={errors.name}>
+              <FormControl isInvalid={errors.fullname}>
                 <FormLabel>Name</FormLabel>
                 <Input
                   type="text"
-                  name="name"
-                  value={formData.name}
+                  name="fullname"
+                  value={formData.fullname}
                   onChange={handleChange}
                   placeholder="Enter your name"
                 />
-                {errors.name && <FormErrorMessage>{errors.name}</FormErrorMessage>}
+                {errors.fullname && <FormErrorMessage>{errors.fullname}</FormErrorMessage>}
               </FormControl>
 
               {/* Contact */}
