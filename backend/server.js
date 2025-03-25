@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const path = require('path')
+const cors = require('cors')
 const bodyParser = require('body-parser')
 const connection = require('./models/db')
 require('dotenv').config()
@@ -8,7 +9,7 @@ require('dotenv').config()
 
 
 
-
+app.use(cors());
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
 app.use(express.json())
 app.use(bodyParser.json())
