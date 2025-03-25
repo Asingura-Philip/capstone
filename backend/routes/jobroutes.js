@@ -39,4 +39,10 @@ router.get('/job/:id', (req, res) => {
     });
 });
 
+
+
+router.post('/test',(req,res)=>{
+    console.log(req.body)
+})
+
 module.exports = router
