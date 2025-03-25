@@ -19,6 +19,7 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom"; // Updated to useNavigate
 import img1 from '../assets/img1.png'
+import axios from 'axios';
 
 
 function SignUpPage() {
@@ -64,32 +65,44 @@ function SignUpPage() {
   //     navigate("/login"); // Redirect to login page after successful signup
   //   }
   // };
-  const handleSubmit = async (e) => { // Make handleSubmit async
-    e.preventDefault();
-    if (validateForm()) {
-        try {
-            const response = await fetch("http://localhost:4040/signup", { // Replace with your API endpoint
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formData),
-            });
+//   const handleSubmit = async (e) => { // Make handleSubmit async
+//     e.preventDefault();
+//     if (validateForm()) {
+//         try {
+//             const response = await fetch("/signup", { // Replace with your API endpoint
+//                 method: "POST",
+//                 headers: {
+//                     "Content-Type": "application/json",
+//                 },
+//                 body: JSON.stringify(formData),
+//             });
 
-            if (response.ok) {
-                alert("Signup successful");
-                navigate("/login");
-            } else {
-                const errorData = await response.json();
-                alert(`Signup failed: ${errorData.message || "An error occurred"}`); // Display backend error message
-            }
-        } catch (error) {
-            console.error("Error during signup:", error);
-            alert("Signup failed: An unexpected error occurred.");
-        }
-    }
-};
+//             if (response.ok) {
+//                 alert("Signup successful");
+//                 // navigate("/login");
+//             } else {
+//                 const errorData = await response.json();
+//                 alert(`Signup failed: ${errorData.message || "An error occurred"}`); // Display backend error message
+//             }
+//         } catch (error) {
+//             console.error("Error during signup:", error);
+//             alert("Signup failed: An unexpected error occurred.");
+//         }
+//     }
+// };
 
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await axios.post('http://localhost:4040/signup', formData);
+    console.log(response.data);
+    alert('User registered successfully!');
+  } catch (error) {
+    console.error('There was an error!', error);
+    alert('Error in registration!');
+  }
+}
  
   return (
     <Flex minHeight="100vh">
