@@ -7,6 +7,8 @@ import LoginPage from './pages/login.jsx';
 import Navbar from './components/navbar.jsx';
 import { Box } from '@chakra-ui/react';
 import JobSeekerDashboard from './pages/jobseekerdashboard.jsx';
+import MyForm from './pages/text.jsx';
+
 
 function App() {
   const location = useLocation();
@@ -20,6 +22,7 @@ function App() {
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/job-seeker-dashboard" element={<JobSeekerDashboard />} />
+        <Route path="/test" element={<MyForm/>}/>
         <Route path="*" element={<div>Page Not Found</div>} />
       </Routes>
     </Box>
