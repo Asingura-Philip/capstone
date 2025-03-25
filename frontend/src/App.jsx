@@ -7,7 +7,7 @@ import LoginPage from './pages/login.jsx';
 import Navbar from './components/navbar.jsx';
 import { Box } from '@chakra-ui/react';
 import JobSeekerDashboard from './pages/jobseekerdashboard.jsx';
-import MyForm from './pages/text.jsx';
+import MyForm from './pages/test.jsx';
 
 
 function App() {
