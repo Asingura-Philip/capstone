@@ -17,10 +17,12 @@ app.use(express.urlencoded({ extended: true })); // For parsing application/x-ww
 
 const jobs = require('./routes/jobroutes')
 const auth = require('./routes/authroutes')
-
+const emp = require('./routes/employerroutes')
 
 app.use('/',jobs)
 app.use('/',auth)
+app.use('/',emp)
+
 app.get('/',(req,res)=>{
     res.send('capstone')
 })
