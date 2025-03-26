@@ -8,11 +8,12 @@ import Navbar from './components/navbar.jsx';
 import { Box } from '@chakra-ui/react';
 import JobSeekerDashboard from './pages/jobseekerdashboard.jsx';
 import MyForm from './pages/test.jsx';
-
+import EmployerDashboard from './pages/employerdashboard.jsx'
+import ErrorBoundary from './components/ErrorBoundary.jsx';
 
 function App() {
   const location = useLocation();
-  const showNavbar = location.pathname !== '/job-seeker-dashboard'; // Hide Navbar on dashboard
+  const showNavbar = location.pathname !== '/job-seeker-dashboard' && location.pathname !== '/employer-dashboard'; // Hide Navbar on dashboard
 
   return (
     <Box minH="100vh">
@@ -22,6 +23,11 @@ function App() {
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/job-seeker-dashboard" element={<JobSeekerDashboard />} />
+        <Route path="/employer-dashboard" element={
+          <ErrorBoundary>
+            <EmployerDashboard />
+          </ErrorBoundary>
+          }/>
         <Route path="/test" element={<MyForm/>}/>
         <Route path="*" element={<div>Page Not Found</div>} />
       </Routes>
