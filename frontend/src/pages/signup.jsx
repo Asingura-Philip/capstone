@@ -57,53 +57,38 @@ function SignUpPage() {
     return Object.keys(formErrors).length === 0;
   };
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   if (validateForm()) {
-  //     // For now, you can replace this with an API call to create the user
-  //     alert("Signup successful");
-  //     navigate("/login"); // Redirect to login page after successful signup
-  //   }
-  // };
-//   const handleSubmit = async (e) => { // Make handleSubmit async
-//     e.preventDefault();
-//     if (validateForm()) {
-//         try {
-//             const response = await fetch("/signup", { // Replace with your API endpoint
-//                 method: "POST",
-//                 headers: {
-//                     "Content-Type": "application/json",
-//                 },
-//                 body: JSON.stringify(formData),
-//             });
-
-//             if (response.ok) {
-//                 alert("Signup successful");
-//                 // navigate("/login");
-//             } else {
-//                 const errorData = await response.json();
-//                 alert(`Signup failed: ${errorData.message || "An error occurred"}`); // Display backend error message
-//             }
-//         } catch (error) {
-//             console.error("Error during signup:", error);
-//             alert("Signup failed: An unexpected error occurred.");
-//         }
-//     }
-// };
-
+ 
 const handleSubmit = async (e) => {
-  e.preventDefault();
+  e.preventDefault(); // Prevent the default form submission behavior
+
+  // First, validate the form data
+  if (!validateForm()) {
+    return;  // If validation fails, stop the form submission
+  }
 
   try {
+    // Send POST request to backend with the form data
     const response = await axios.post('http://localhost:4040/signup', formData);
+
+    // Log the response from the backend
     console.log(response.data);
-    alert('User registered successfully!');
+
+    // Check if the response indicates a successful signup
+    if (response.status === 201) {  // Status 201 means "Created" (success)
+      alert('Signup successful');
+      navigate('/login');  // Redirect to login page
+    } else {
+      // Handle case where the backend returned an error or unexpected response
+      alert(`Signup failed: ${response.data.message || 'An error occurred'}`);
+    }
   } catch (error) {
-    console.error('There was an error!', error);
+    // Handle any errors that occurred during the request
+    console.error('There was an error!', error.message);
     alert('Error in registration!');
   }
-}
- 
+};
+
+
   return (
     <Flex minHeight="100vh">
       {/* Left Half (Background Image and Info) */}
