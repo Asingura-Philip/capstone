@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Container,
@@ -18,6 +18,7 @@ import {
 } from "@chakra-ui/react";
 import { SearchIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function JobSeekerDashboard() {
   const [profile, setProfile] = useState({
@@ -32,44 +33,56 @@ function JobSeekerDashboard() {
 
   const [workExperience, setWorkExperience] = useState([]);
   const [jobSearch, setJobSearch] = useState("");
-  const [availableJobs, setAvailableJobs] = useState([
-    {
-      id: 1,
-      title: "Software Engineer",
-      company: "Tech Innovations Inc.",
-      location: "Kampala, UG",
-    },
-    {
-      id: 2,
-      title: "Marketing Manager",
-      company: "Global Marketing Solutions",
-      location: "Mombasa, Kenya",
-    },
-    {
-      id: 3,
-      title: "Data Analyst",
-      company: "Data Insights Ltd.",
-      location: "Fort Portal, UG",
-    },
-    {
-      id: 4,
-      title: "Web Developer",
-      company: "WebCraft Studios",
-      location: "Jinja, UG",
-    },
-    {
-      id: 5,
-      title: "Project Manager",
-      company: "Project Dynamics Corp.",
-      location: "Kigali,Rwanda",
-    },
-      {
-      id: 6,
-      title: "Graphic Designer",
-      company: "Design Hub",
-      location: "Jubah, South Sudan",
-    },
-  ]);
+  const [availableJobs, setAvailableJobs] = useState([]);
+
+  // Fetch jobs from the backend when the component mounts
+  useEffect(() => {
+    axios.get('http://localhost:4040/jobs')
+      .then((response) => {
+        setAvailableJobs(response.data);
+      })
+      .catch((error) => {
+        console.error('There was an error fetching the jobs:', error);
+      });
+  }, []);
+  // const [availableJobs, setAvailableJobs] = useState([
+  //   {
+  //     id: 1,
+  //     title: "Software Engineer",
+  //     company: "Tech Innovations Inc.",
+  //     location: "Kampala, UG",
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "Marketing Manager",
+  //     company: "Global Marketing Solutions",
+  //     location: "Mombasa, Kenya",
+  //   },
+  //   {
+  //     id: 3,
+  //     title: "Data Analyst",
+  //     company: "Data Insights Ltd.",
+  //     location: "Fort Portal, UG",
+  //   },
+  //   {
+  //     id: 4,
+  //     title: "Web Developer",
+  //     company: "WebCraft Studios",
+  //     location: "Jinja, UG",
+  //   },
+  //   {
+  //     id: 5,
+  //     title: "Project Manager",
+  //     company: "Project Dynamics Corp.",
+  //     location: "Kigali,Rwanda",
+  //   },
+  //     {
+  //     id: 6,
+  //     title: "Graphic Designer",
+  //     company: "Design Hub",
+  //     location: "Jubah, South Sudan",
+  //   },
+  // ]);
   const navigate = useNavigate();
 
   const handleSaveProfile = () => {
