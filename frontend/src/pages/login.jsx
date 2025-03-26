@@ -16,6 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom"; // Updated to useNavigate
 import img2 from '../assets/img2.png'
+import axios from "axios";
 
 function LoginPage() {
   const [formData, setFormData] = useState({
@@ -42,12 +43,32 @@ function LoginPage() {
     return Object.keys(formErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      // For now, you can replace this with an API call to authenticate the user
-      alert("Login successful");
-      navigate("/dashboard"); // Redirect to dashboard or homepage after successful login
+      try {
+        const response = await axios.post('http://localhost:4040/login', formData);
+
+        if (response.status === 200) {
+          alert(response.data.message);
+          // Get the usertype from the response
+          const userType = response.data.userType;
+
+          // Navigate based on usertype
+          if (userType === 'employer') {
+            navigate("/employer-dashboard");
+          } else if (userType === 'job_seeker') {
+            navigate("/job-seeker-dashboard");
+          } // Redirect to dashboard or homepage after successful login
+        }
+      } catch (error) {
+        // Handle error responses from the backend
+        if (error.response) {
+          alert(error.response.data.error || 'An error occurred');
+        } else {
+          alert('An error occurred, please try again');
+        }
+      }
     }
   };
 
