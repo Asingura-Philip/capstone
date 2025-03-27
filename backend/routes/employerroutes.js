@@ -22,11 +22,11 @@ router.post("/employer/jobs", (req, res) => {
 
 // GET all jobs posted by an employer
 router.get("/employer/jobs", (req, res) => {
-    const employerId = req.user.id;  // assuming employer is authenticated and their ID is available
+    const employerId = req.user.email;  // assuming employer is authenticated and their ID is available
   
     const query = `
       SELECT * FROM jobs
-      WHERE employer_id = ?;
+      WHERE email = ?;
     `;
   
     connection.query(query, [employerId], (err, results) => {
