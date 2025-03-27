@@ -1,107 +1,88 @@
-const express = require ('express')
-const router = express.Router()
-const connection = require('../models/db')
-const bcrypt = require('bcrypt');
+const express = require("express");
+const connection = require("../models/db");  // Import the database connection
+const router = express.Router();
 
+// POST a new job
+router.post("/employer/jobs", (req, res) => {
+  const { title, description, location, company, userId } = req.body;
 
-router.post('/signup', async (req, res) => {
-    console.log(req.body);
-    const { fullname, contact, email, field, userType, password } = req.body;
-  
-    try {
-      // Check if user already exists
-      const existingUser = await new Promise((resolve, reject) => {
-        connection.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(results);
-          }
-        });
-      });
-  
-      if (existingUser.length > 0) {
-        return res.status(400).json({ message: 'User already exists' });
-      }
-  
-      // Hash the password before saving
-      const hashedPassword = await bcrypt.hash(password, 10);
-  
-      // Insert new user into the database
-      const sql = 'INSERT INTO users (fullname, contact, email, field, userType, password) VALUES (?, ?, ?, ?, ?, ?)';
-      const values = [fullname, contact, email, field, userType, hashedPassword];
-  
-      await new Promise((resolve, reject) => {
-        connection.query(sql, values, (err, results) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(results);
-          }
-        });
-      });
-  
-      res.status(201).json({ message: 'User created successfully' });
-    } catch (error) {
-      console.error('Signup error:', error);
-      res.status(500).json({ message: 'Internal server error' });
+  const query = `
+    INSERT INTO jobs (title, description, location, company, user_id)
+    VALUES (?, ?, ?, ?, ?);
+  `;
+
+  connection.query(query, [title, description, location, company, userId], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Error posting job" });
     }
+    res.status(201).json({ message: "Job posted successfully", jobId: results.insertId });
   });
+});
 
-router.post('/login', (req, res) => {
-    const { email, password } = req.body;
-  
-    // Validate input
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
+
+
+// GET all jobs posted by an employer
+router.get("/employer/jobs", (req, res) => {
+  const userId = req.user.user_id;  // assuming employer is authenticated and their ID is available
+
+  const query = `
+    SELECT * FROM jobs
+    WHERE user_id = ?;
+  `;
+
+  connection.query(query, [userId], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Error fetching jobs" });
     }
-  
-    // Query to get user by email
-    const query = 'SELECT * FROM users WHERE email = ?'; // Change 'users' to your actual table name
-  
-    connection.execute(query, [email], (err, results) => {
-      if (err) {
-        console.error('Database error:', err);
-        if (!res.headersSent) {
-          return res.status(500).json({ error: 'Internal server error' });
-        }
-      }
-  
-      if (results.length === 0) {
-        if (!res.headersSent) {
-          return res.status(401).json({ error: 'Invalid email or password' });
-        }
-      }
-  
-      const user = results[0];
-  
-      // Compare hashed password with bcrypt
-      bcrypt.compare(password, user.password, (err, isMatch) => {
-        if (err) {
-          console.error('Error comparing passwords:', err);
-          if (!res.headersSent) {
-            return res.status(500).json({ error: 'Internal server error' });
-          }
-        }
-  
-        if (!isMatch) {
-          if (!res.headersSent) {
-            return res.status(401).json({ error: 'Invalid email or password' });
-          }
-        }
-  
-        // Password is correct, send the response
-        if (!res.headersSent) {
-          return res.status(200).json({
-            message: 'Login successful',
-            token: 'your-jwt-token',
-            userType: user.userType,
-          });
-        }
-      });
-    });
+    res.status(200).json(results);
   });
-  
+});
 
+// GET all applications for jobs posted by an employer
+router.get("/employer/applications", (req, res) => {
+  const userId = req.user.user_id;  // assuming employer is authenticated and their ID is available
+
+  const query = `
+    SELECT a.*, j.title AS job_title, j.company AS job_company
+    FROM applications a
+    JOIN jobs j ON a.job_id = j.id
+    WHERE j.user_id = ?;
+  `;
+
+  connection.query(query, [userId], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Error fetching applications" });
+    }
+    res.status(200).json(results);
+  });
+});
+
+// PUT - Edit employer profile
+router.put("/employer/profile", (req, res) => {
+  const { name, email, contact, company } = req.body;
+  const userId = req.user.user_id;  // assuming employer is authenticated and their ID is available
+
+  const query = `
+    UPDATE users
+    SET name = ?, email = ?, contact = ?, company = ?
+    WHERE id = ? AND usertype = 'employer';
+  `;
+
+  connection.query(query, [name, email, contact, company, userId], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Error updating profile" });
+    }
+
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: "Employer not found" });
+    }
+
+    res.status(200).json({ message: "Profile updated successfully" });
+  });
+});
 
 module.exports = router;
